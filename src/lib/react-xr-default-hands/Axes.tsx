@@ -8,9 +8,10 @@ import { HandModel } from './HandModel'
 interface Props {
   controller: XRController
   model: HandModel
+  useGuides?: boolean
 }
 
-export function Axes({ controller, model }: Props) {
+export function Axes({ controller, model, useGuides = false }: Props) {
   useFrame(() => {
     if (!model || model?.bones.length === 0) {
       return
@@ -39,7 +40,7 @@ export function Axes({ controller, model }: Props) {
 
     const zPoints: Vector3[] = [position.clone(), position.clone().add(z)]
     const zGeom = new BufferGeometry().setFromPoints(zPoints)
-    zRef.current.geometry = zGeom
+    //zRef.current.geometry = zGeom
 
     const y = indexKnuckle.getWorldPosition(new Vector3()).sub(pinkyKnuckle.getWorldPosition(new Vector3())).normalize()
 
@@ -54,13 +55,13 @@ export function Axes({ controller, model }: Props) {
 
     const xPoints: Vector3[] = [position.clone(), position.clone().add(x.clone())]
     const xGeom = new BufferGeometry().setFromPoints(xPoints)
-    xRef.current.geometry = xGeom
+    //xRef.current.geometry = xGeom
 
     const y2 = new Vector3().crossVectors(x, z).negate()
 
     const y2Points: Vector3[] = [position.clone(), position.clone().add(y2.clone())]
     const y2Geom = new BufferGeometry().setFromPoints(y2Points)
-    y2Ref.current.geometry = y2Geom
+    //y2Ref.current.geometry = y2Geom
 
     const distance = indexTip.getWorldPosition(new Vector3()).sub(thumbTip.getWorldPosition(new Vector3()))
 
@@ -100,14 +101,21 @@ export function Axes({ controller, model }: Props) {
       <mesh ref={pinkyKnuckleRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'green' })} />
       <mesh ref={positionRef} geometry={new SphereGeometry(0.005)} material={new MeshBasicMaterial({ color: 'white' })} />
 
-      {/* @ts-ignore */}
-      <line ref={zRef} material={new LineBasicMaterial({ color: 'blue' })} />
-      {/* @ts-ignore
-      <line ref={yRef} material={new LineBasicMaterial({ color: 'darkgreen' })} /> */}
-      {/* @ts-ignore */}
-      <line ref={y2Ref} material={new LineBasicMaterial({ color: 'green' })} />
-      {/* @ts-ignore */}
-      <line ref={xRef} material={new LineBasicMaterial({ color: 'red' })} />
+      {useGuides && (
+        <>
+          {/* @ts-ignore */}
+          <line ref={zRef} material={new LineBasicMaterial({ color: "blue" })}
+          />
+          {/* @ts-ignore */}
+          <line ref={yRef} material={new LineBasicMaterial({ color: "darkgreen" })}
+          />
+          {/* @ts-ignore */}
+          <line ref={y2Ref} material={new LineBasicMaterial({ color: "green" })}
+          />
+          {/* @ts-ignore */}
+          <line ref={xRef} material={new LineBasicMaterial({ color: "red" })} />
+        </>
+      )}
     </group>
   )
 }
