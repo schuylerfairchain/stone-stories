@@ -13,14 +13,18 @@ export const Grab = forwardRef(
     {
       children,
       disabled = false,
+      isGrabbed,
       onChange,
+      setPosition,
       // instead of checking for a generic way here, do the calculation in the Interactable itself.
       callback,
       ...props
     }: {
       children: ReactNode
       disabled?: boolean
+      isGrabbed?: boolean
       onChange: ({ isGrabbed, controller }: { isGrabbed: boolean; controller: XRController }) => void
+      setPosition: (position: number[]) => void
       callback: ({ controller, model }: { controller: XRController; model: HandModel }) => boolean
     },
     passedRef
@@ -151,6 +155,8 @@ export const Grab = forwardRef(
         const position = model.getHandPosition()
         transform = new Matrix4().compose(position, previousQuaternion, new Vector3(1, 1, 1))
       }
+
+      setPosition(model.getHandPosition().toArray());
 
       ref.current!.applyMatrix4(transform)
 
