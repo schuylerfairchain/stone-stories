@@ -1,10 +1,50 @@
 import { Physics, useBox, usePlane } from "@react-three/cannon";
 import { Plane, useGLTF } from "@react-three/drei";
 import { VRCanvas } from "@react-three/xr";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import "./App.css";
 import { DefaultHandControllers } from "./lib/react-xr-default-hands/DefaultHandControllers";
 import { Grabbable } from "./Grabbable";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCVuU77lr4SMGtLdpJy2YW9gyHwyEO5f2Y",
+  authDomain: "reality-hack.firebaseapp.com",
+  projectId: "reality-hack",
+  storageBucket: "reality-hack.appspot.com",
+  messagingSenderId: "781486086310",
+  appId: "1:781486086310:web:a44c7c775f5cc8ed89fc67",
+};
+
+// Initialize Firebase
+let app;
+let db;
+
+const bootstrap = async () => {
+  app = initializeApp(firebaseConfig);
+
+  db = getFirestore(app);
+};
+
+bootstrap();
+
+const addStone = async (stoneData) => {
+  const docRef = await addDoc(collection(db, "stones"), stoneData);
+  console.log("Stone deposited with ID: ", docRef.id);
+};
+
+const getStones = async () => {
+  const querySnapshot = await getDocs(collection(db, "stones"));
+  querySnapshot.forEach((doc) => {
+    console.log(`${doc.id} => ${doc.data()}`);
+  });
+  return true;
+};
 
 function Floor({ ...props }) {
   const [ref] = usePlane(() => ({ ...props }));
@@ -53,12 +93,20 @@ function RokPile() {
   );
   let nodeMeshes = [];
   for (const node in nodes) {
-    //@ts-ignore
-    nodeMeshes.push(<mesh key={node} geometry={nodes[node].geometry} material={materials["skatter_gravel_01"]} />);
+    nodeMeshes.push(
+      <mesh
+        key={node}
+        //@ts-ignore
+        geometry={nodes[node].geometry}
+        material={materials["skatter_gravel_01"]}
+      />
+    );
   }
-  return <group position={[0,-1,0]}>
-    {nodeMeshes.map((nodeMesh) => nodeMesh)}
-  </group>;
+  return (
+    <group position={[0, -1, 0]}>
+      {nodeMeshes.map((nodeMesh) => nodeMesh)}
+    </group>
+  );
 }
 
 function World() {
@@ -67,6 +115,13 @@ function World() {
 
   const initialPosition = [0, 1, -0.25];
   const [position, setPosition] = useState(initialPosition);
+
+  const stones = getStones();
+
+  useEffect(() => {
+    addStone({ position: "hello again" });
+    console.log("should be updated");
+  }, [hasGrabbed]);
 
   return (
     <Physics>
