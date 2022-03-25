@@ -53,9 +53,6 @@ export const Grab = forwardRef(
         })
         grabbingController.current = undefined
         previousTransform.current = undefined
-        const pos = new Vector3();
-        physicsApi.position.copy(pos)
-        console.log(pos);
         onChange?.({ isGrabbed: false, controller: e.controller })
       }
     })
@@ -63,7 +60,7 @@ export const Grab = forwardRef(
     useXREvent('selectstart', (e: XREvent) => {
       // if the controller is already interacting, don't do anything
       // if hand tracking is enabled, but it's not a fake event, don't do anything
-      if ((disabled && interacting[e.controller.inputSource.handedness]) || (isHandTracking && !e.originalEvent.fake)) {
+      if ((disabled || interacting[e.controller.inputSource.handedness]) || (isHandTracking && !e.originalEvent.fake)) {
         return
       }
 
@@ -92,9 +89,9 @@ export const Grab = forwardRef(
         }
 
         const obb = new OBB(
-          new Vector3().setFromMatrixPosition(ref.current!.matrixWorld),
-          (mesh.geometry!.boundingBox as Box3).getSize(new Vector3()).multiply(ref.current!.scale).divideScalar(2),
-          new Matrix3().setFromMatrix4(ref.current!.matrixWorld.clone().makeScale(1, 1, 1))
+          new Vector3().setFromMatrixPosition(mesh.matrixWorld),
+          (mesh.geometry!.boundingBox as Box3).getSize(new Vector3()).multiply(mesh.scale).divideScalar(2),
+          new Matrix3().setFromMatrix4(mesh.matrixWorld.clone().makeScale(1, 1, 1))
         )
 
         const matrix = model!.getHandRotationMatrix()
@@ -160,16 +157,12 @@ export const Grab = forwardRef(
         const position = model.getHandPosition()
         transform = new Matrix4().compose(position, previousQuaternion, new Vector3(1, 1, 1))
       }
-
       const pos = new Vector3().setFromMatrixPosition(transform);
       const rot = new Quaternion().setFromRotationMatrix(transform);
 
       physicsApi.position.set(pos.x, pos.y, pos.z);
       physicsApi.quaternion.set(rot.x, rot.y, rot.z, rot.w);
 
-      // ref.current!.applyMatrix4(transform)
-
-      // ref.current!.updateWorldMatrix(false, true)
       previousTransform.current = transform.clone()
     })
 

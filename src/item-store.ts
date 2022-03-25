@@ -1,5 +1,4 @@
-import { Api, PublicApi } from '@react-three/cannon'
-import { Body } from 'cannon-es'
+import { PublicApi } from '@react-three/cannon'
 import produce, { setAutoFreeze } from 'immer'
 import createStore, { State as ZustandState, StateCreator } from 'zustand'
 
@@ -13,11 +12,10 @@ const immer =
 setAutoFreeze(false)
 
 export interface ItemState {
-    id: string;
-    api: PublicApi;
-    // position: Vector3;
-    // quaternion: Quaternion;
-    // body: Body;
+    api?: PublicApi;
+    position: [number, number, number];
+    quaternion: [number, number, number, number];
+    frozen: boolean;
 }
 
 export type State = {
@@ -29,8 +27,19 @@ export type State = {
 export const useItemStore = createStore<State>(
   immer((set, get, api) => {
     return {
-      itemIds: ['1'],
-      items: {} as Record<string, ItemState>,
+      itemIds: ['a', 'b'],
+      items: {
+        a: {
+          position: [0, 2.5, -0.5],
+          quaternion: [0, 0, 0, 1],
+          frozen: false
+        },
+        b: {
+          position: [0, 0.5, -0.5],
+          quaternion: [0, 0, 0, 1],
+          frozen: false
+        }
+      } as Record<string, ItemState>,
       set: (fn: (state: State) => State | void) => {
         set(fn)
       }

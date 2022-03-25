@@ -159,7 +159,7 @@ export function DefaultHandControllers({ modelPaths }: { modelPaths?: { [key in 
     <>
       {process.env.NODE_ENV === 'development' &&
         controllers.map((c, index) =>
-          models?.current[c.inputSource.handedness] ? <Axes controller={c} model={models!.current[c.inputSource.handedness]!} /> : null
+          models?.current[c.inputSource.handedness] ? <Axes key={index} controller={c} model={models!.current[c.inputSource.handedness]!} /> : null
         )}
     </>
   )
