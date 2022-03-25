@@ -27,7 +27,7 @@ export type State = {
 export const useItemStore = createStore<State>(
   immer((set, get, api) => {
     return {
-      itemIds: ['a', 'b'],
+      itemIds: ['a', 'b', 'c', 'd'],
       items: {
         a: {
           position: [0, 0.9, -0.3],
@@ -36,6 +36,14 @@ export const useItemStore = createStore<State>(
         },
         b: {
           position: [0, 0.5, -0.5],
+          quaternion: [0, 0, 0, 1],
+          frozen: false
+        },c: {
+          position: [0, 1, -0.5],
+          quaternion: [0, 0, 0, 1],
+          frozen: false
+        },d: {
+          position: [0.2, 2, -0.5],
           quaternion: [0, 0, 0, 1],
           frozen: false
         }

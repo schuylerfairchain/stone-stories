@@ -64,14 +64,13 @@ export function TestCube({itemId, ...props}) {
     }
   }, [isGrabbing, api, item.frozen])
   
-  const {nodes} = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
+  const {nodes, materials} = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
 
   return <Grab physicsApi={api} disabled={item.frozen} onChange={({isGrabbed}) => {
     setIsGrabbing(isGrabbed);
   }}>
     
-      <mesh ref={ref} name="cube" {...props} castShadow geometry={(nodes.Object123 as any).geometry}>
-      <meshStandardMaterial attach="material" color={isGrabbing ? 'red': 'gray'} />
+      <mesh ref={ref} name="cube" {...props} castShadow geometry={(nodes.Object123 as any).geometry} material={materials['skatter_rock_01 [imported]']}>
         </mesh>
   </Grab>;
 }
