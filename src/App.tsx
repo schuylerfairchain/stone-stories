@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { Grab } from './lib/react-xr-default-hands/Grab';
 
 const CUBE_SIZE = 0.3;
+const CUBE_MASS = 1;
 
 function TestCube({itemId, ...props}) {
   const set = useItemStore((store) => store.set);
@@ -17,7 +18,19 @@ function TestCube({itemId, ...props}) {
 
   const [isGrabbing, setIsGrabbing] = useState(false);
 
-  const [ref, api] = useBox(() => ({mass:10, args: [CUBE_SIZE, CUBE_SIZE, CUBE_SIZE], position: item.position, quaternion: item.quaternion, type: item.frozen ? 'Kinematic': 'Dynamic', sleepSpeedLimit: 0.2}));
+  const [ref, api] = useBox(() => {
+    const options: any = {
+      args: [CUBE_SIZE, CUBE_SIZE, CUBE_SIZE], position: item.position, quaternion: item.quaternion,
+      type: item.frozen ? 'Kinematic' : 'Dynamic'
+    };
+
+    if(!item.frozen) {
+      options.mass = CUBE_MASS;
+      options.sleepSpeedLimit = 0.2;
+    }
+    
+    return options;
+  });
 
   useEffect(() => {
     if(!api) return;
@@ -48,7 +61,7 @@ function TestCube({itemId, ...props}) {
       if(isGrabbing) {
         api.mass.set(0);
       } else{
-        api.mass.set(10);
+        api.mass.set(CUBE_MASS);
       }
     }
   }, [isGrabbing, api, item.frozen])
