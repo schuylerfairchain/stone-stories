@@ -1,3 +1,4 @@
+import { PublicApi } from '@react-three/cannon'
 import { useFrame } from '@react-three/fiber'
 import { useXR, useXREvent, XRController, XREvent } from '@react-three/xr'
 import React, { forwardRef, ReactNode, useRef } from 'react'
@@ -12,16 +13,18 @@ export const Grab = forwardRef(
   (
     {
       children,
+      physicsApi,
       disabled = false,
       onChange,
       // instead of checking for a generic way here, do the calculation in the Interactable itself.
       callback,
       ...props
     }: {
-      children: ReactNode
+      children: ReactNode;
+      physicsApi: PublicApi;
       disabled?: boolean
-      onChange: ({ isGrabbed, controller }: { isGrabbed: boolean; controller: XRController }) => void
-      callback: ({ controller, model }: { controller: XRController; model: HandModel }) => boolean
+      onChange?: ({ isGrabbed, controller }: { isGrabbed: boolean; controller: XRController }) => void
+      callback?: ({ controller, model }: { controller: XRController; model: HandModel }) => boolean
     },
     passedRef
   ) => {
@@ -50,7 +53,10 @@ export const Grab = forwardRef(
         })
         grabbingController.current = undefined
         previousTransform.current = undefined
-        onChange({ isGrabbed: false, controller: e.controller })
+        const pos = new Vector3();
+        physicsApi.position.copy(pos)
+        console.log(pos);
+        onChange?.({ isGrabbed: false, controller: e.controller })
       }
     })
 
@@ -116,7 +122,10 @@ export const Grab = forwardRef(
         grabbingController.current = e.controller
         const transform = model.getHandTransform()
         previousTransform.current = transform.clone()
-        onChange({ isGrabbed: true, controller: e.controller })
+        set((store) => {
+          store.hands.interacting!.current[grabbingController.current.inputSource.handedness] = ref.current
+        })
+        onChange?.({ isGrabbed: true, controller: e.controller })
       }
     })
 
@@ -134,7 +143,7 @@ export const Grab = forwardRef(
       let transform = model.getHandTransform()
 
       // apply previous transform
-      ref.current!.applyMatrix4(previousTransform.current.clone().invert())
+      // ref.current!.applyMatrix4(previousTransform.current.clone().invert())
 
       if (isHandTracking) {
         // get quaternion from previous matrix
@@ -152,9 +161,15 @@ export const Grab = forwardRef(
         transform = new Matrix4().compose(position, previousQuaternion, new Vector3(1, 1, 1))
       }
 
-      ref.current!.applyMatrix4(transform)
+      const pos = new Vector3().setFromMatrixPosition(transform);
+      const rot = new Quaternion().setFromRotationMatrix(transform);
 
-      ref.current!.updateWorldMatrix(false, true)
+      physicsApi.position.set(pos.x, pos.y, pos.z);
+      physicsApi.quaternion.set(rot.x, rot.y, rot.z, rot.w);
+
+      // ref.current!.applyMatrix4(transform)
+
+      // ref.current!.updateWorldMatrix(false, true)
       previousTransform.current = transform.clone()
     })
 
