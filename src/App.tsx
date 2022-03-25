@@ -47,6 +47,20 @@ function RokPhysics({ position }) {
   );
 }
 
+function RokPile() {
+  const { nodes, materials } = useGLTF(
+    process.env.PUBLIC_URL + "/Piles-big.gltf"
+  );
+  let nodeMeshes = [];
+  for (const node in nodes) {
+    //@ts-ignore
+    nodeMeshes.push(<mesh key={node} geometry={nodes[node].geometry} material={materials["skatter_gravel_01"]} />);
+  }
+  return <group position={[0,-1,0]}>
+    {nodeMeshes.map((nodeMesh) => nodeMesh)}
+  </group>;
+}
+
 function World() {
   const [isGrabbed, setGrabbed] = useState(false);
   const [hasGrabbed, setHasGrabbed] = useState(false);
@@ -57,6 +71,7 @@ function World() {
   return (
     <Physics>
       <Floor rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} />
+      <RokPile />
 
       {isGrabbed || !hasGrabbed ? (
         <Grabbable
@@ -96,5 +111,6 @@ function App() {
 }
 
 useGLTF.preload(process.env.PUBLIC_URL + "/newPiles.gltf");
+useGLTF.preload(process.env.PUBLIC_URL + "/Piles-big.gltf");
 
 export default App;
