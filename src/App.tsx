@@ -1,12 +1,7 @@
-import {
-  Physics,
-  useBox,
-  useConvexPolyhedron,
-  usePlane,
-} from "@react-three/cannon";
-import { Box, Plane, useGLTF } from "@react-three/drei";
+import { Physics, useBox, usePlane } from "@react-three/cannon";
+import { Plane, useGLTF } from "@react-three/drei";
 import { VRCanvas } from "@react-three/xr";
-import { Suspense, useState, useRef } from "react";
+import { Suspense, useState } from "react";
 import "./App.css";
 import { DefaultHandControllers } from "./lib/react-xr-default-hands/DefaultHandControllers";
 import { Grabbable } from "./Grabbable";
@@ -21,26 +16,10 @@ function Floor({ ...props }) {
   );
 }
 
-function TestCube() {
-  return (
-    <Box args={[0.2, 0.2, 0.2]} name="cube">
-      <meshStandardMaterial attach="material" color="red" />
-    </Box>
-  );
-}
-
-function Cube({ position }) {
-  const [ref] = useBox(() => ({ mass: 1, position: position }));
-  return (
-    <mesh ref={ref}>
-      <boxGeometry args={[0.5, 0.5, 0.5]} attach="geometry" />
-      <meshStandardMaterial attach="material" color="red" />
-    </mesh>
-  );
-}
-
 function RokGrab() {
-  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
+  const { nodes, materials } = useGLTF(
+    process.env.PUBLIC_URL + "/newPiles.gltf"
+  );
   return (
     <mesh
       //@ts-ignore
@@ -50,9 +29,14 @@ function RokGrab() {
   );
 }
 
-function RokPhysics(position) {
-  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
-  const [ref] = useBox(() => ({ mass: 1, position: position }));
+function RokPhysics({ position }) {
+  const { nodes, materials } = useGLTF(
+    process.env.PUBLIC_URL + "/newPiles.gltf"
+  );
+  const [ref, api] = useBox(() => ({
+    mass: 1,
+    position: position,
+  }));
   return (
     <mesh
       ref={ref}
@@ -111,6 +95,6 @@ function App() {
   );
 }
 
-useGLTF.preload(process.env.PUBLIC_URL + "/Piles.gltf");
+useGLTF.preload(process.env.PUBLIC_URL + "/newPiles.gltf");
 
 export default App;
