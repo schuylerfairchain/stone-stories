@@ -1,5 +1,5 @@
 import { useBox } from "@react-three/cannon";
-import { Box, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { useItemStore } from "./item-store";
 import { Grab } from "./lib/react-xr-default-hands/Grab";
@@ -55,44 +55,25 @@ export function TestCube({itemId, ...props}) {
     if(!item.frozen) {
       if(isGrabbing) {
         api.mass.set(0);
+        api.allowSleep.set(false);
+        api.wakeUp();
       } else{
         api.mass.set(CUBE_MASS);
+        api.allowSleep.set(true);
       }
     }
   }, [isGrabbing, api, item.frozen])
   
   const {nodes} = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
 
-  // console.log(gltf);
-
-  // const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/Piles.gltf");
-
-  // useEffect(() => console.log(materials) ,[materials]);
-  // useEffect(() => console.log(nodes), [nodes]);
-
-  console.log(ref.current?.position);
-
   return <Grab physicsApi={api} disabled={item.frozen} onChange={({isGrabbed}) => {
     setIsGrabbing(isGrabbed);
   }}>
     
-    <Box ref={ref} args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} castShadow name="cube" {...props}>
-  <meshPhongMaterial color={isGrabbing ? 'red': 'gray'} />
-      </Box>
-    {/* <group ref={ref}>
-      <primitive object={nodes.Object123} castShadow>
+      <mesh ref={ref} name="cube" {...props} castShadow geometry={(nodes.Object123 as any).geometry}>
       <meshStandardMaterial attach="material" color={isGrabbing ? 'red': 'gray'} />
-        
-      </primitive>
-
-        </group> */}
-    
+        </mesh>
   </Grab>;
 }
-
-      /* <mesh castShadow geometry={(nodes.Object123 as any).geometry}
-        // material={materials["skatter_rock_01 [imported]"]}
-        >
-      </mesh> */
 
 useGLTF.preload(process.env.PUBLIC_URL + "/Piles.gltf")
