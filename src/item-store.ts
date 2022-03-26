@@ -12,6 +12,7 @@ const immer =
 setAutoFreeze(false)
 
 export interface ItemState {
+    id?: string;
     api?: PublicApi;
     position: [number, number, number];
     quaternion: [number, number, number, number];
@@ -28,7 +29,7 @@ export const useItemStore = createStore<State>(
   immer((set, get, api) => {
     return {
       items: {
-        a: {
+        /*a: {
           position: [0, 0.9, -0.3],
           quaternion: [0, 0, 0, 1],
           frozen: false,
@@ -49,7 +50,7 @@ export const useItemStore = createStore<State>(
           quaternion: [0, 0, 0, 1],
           frozen: false,
           model: 'rock-irregular'
-        }
+        }*/
       } as Record<string, ItemState>,
       set: (fn: (state: State) => State | void) => {
         set(fn)

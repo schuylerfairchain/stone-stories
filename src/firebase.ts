@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { ItemState } from "./item-store";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -33,10 +34,15 @@ export const addStone = async (stoneData) => {
 
 export const getStones = async () => {
   const querySnapshot = await getDocs(collection(db, "stones"));
+  const stones: ItemState[] = [];
+
   querySnapshot.forEach((doc) => {
-    console.log(`${doc.id} => ${doc.data()}`);
+    console.log(doc);
+    const stone = {id: doc.id, ...doc.data()};
+    console.log(stone);
+    stones.push(stone as unknown as ItemState);
   });
-  return true;
+  return stones;
 };
 
 // const stones = getStones();
