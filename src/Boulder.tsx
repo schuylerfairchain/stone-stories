@@ -47,7 +47,7 @@ const BoulderModel = forwardRef<Object3D, {type: string} & any>(({type, ...rest}
   const metadata = boulderMetadata[type];
   const {nodes, materials} = useGLTF(assetUrl(metadata.path));
 
-  return     <mesh ref={ref} {...rest} castShadows geometry={(nodes[metadata.objectName] as any).geometry} material={materials[metadata.materialName]}/>;
+  return <mesh ref={ref} {...rest} castShadow receiveShadow geometry={(nodes[metadata.objectName] as any).geometry} material={materials[metadata.materialName]}/>;
 });
 
 export function Boulder({itemId, ...props}) {
@@ -61,16 +61,15 @@ export function Boulder({itemId, ...props}) {
       args: boulderMetadata[item.model].physicsBox,
       position: item.position,
       quaternion: item.quaternion,
-      type: item.frozen ? 'Static' : 'Dynamic',
     };
     
-    if(!item.frozen) {
+    if(!item.frozen && !item.levitating) {
       options.mass = CUBE_MASS;
-      options.sleepSpeedLimit = 0.2;
+      options.sleepSpeedLimit = 0.5;
     }
     
     return options;
-  });
+  }, null, [item.frozen, item.levitating]);
 
   useEffect(() => {
     if(!api) return;
@@ -102,18 +101,34 @@ export function Boulder({itemId, ...props}) {
         api.mass.set(0);
         api.allowSleep.set(false);
         api.wakeUp();
+
+        if(item.levitating) {
+          set(store => {
+            store.items[itemId].touched = true;
+          });
+        }
       } else{
-        api.mass.set(CUBE_MASS);
+        if(item.levitating && item.touched) {
+          api.mass.set(CUBE_MASS);
+          api.allowSleep.set(false);
+          api.wakeUp();
+          set(store => {
+            store.items[itemId].levitating = false;
+          })
+        }
+        if(!item.levitating) {
+          api.mass.set(CUBE_MASS);
+        }
         api.allowSleep.set(true);
       }
     }
-  }, [isGrabbing, api, item.frozen])
+  }, [isGrabbing, api, item.frozen, item.levitating, set, itemId, item.touched, item]);
   
 
   const model = <BoulderModel ref={ref} type={item.model}/>;
 
   return !item.frozen ? 
-    <Grab physicsApi={api} disabled={item.frozen} onChange={({isGrabbed}) => {
+    <Grab physicsApi={api} onChange={({isGrabbed}) => {
     setIsGrabbing(isGrabbed);
   }}>
     {model}

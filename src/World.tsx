@@ -1,30 +1,82 @@
 import { Physics } from "@react-three/cannon";
 import { Suspense, useEffect } from "react";
 import { Floor } from "./Floor";
-import { useItemStore } from "./item-store";
+import { ItemState, useItemStore } from "./item-store";
 import { Boulder } from "./Boulder";
 import { getStones } from "./firebase";
 
-function useLoadStones() {
+function useInitStones() {
   const set = useItemStore(store => store.set);
 
   useEffect(() => {
     if(!set) return;
     async function load() {
       const items = await getStones();
-      console.log(items);
-      set(store => {
-        store.items = Object.fromEntries(items.map(item => [item.id, item]));
-      })
+      for(const item of items) {
+        set(store => {
+          store.items[item.id] = item;
+        });
+      }
     }
     load();
+  }, [set]);
+}
+
+const NEW_STONE_HEIGHT = 1.2;
+
+function useInitNewStones() {
+  const set = useItemStore(store => store.set);
+
+  useEffect(() => {
+    if(!set) return;
+    const newBoulders: ItemState[] = [
+      {
+        id: '_1',
+        model: 'rock-irregular',
+        position: [-0.5, NEW_STONE_HEIGHT, -1],
+        quaternion: [0, 0, 0, 1],
+        levitating: true,
+        frozen: false
+      },
+      {
+        id: '_2',
+        model: 'rock-big',
+        position: [-1, NEW_STONE_HEIGHT, -1],
+        quaternion: [0, 0, 0, 1],
+        levitating: true,
+        frozen: false
+      },
+      {
+        id: '_3',
+        model: 'rock-gray',
+        position: [0.2, NEW_STONE_HEIGHT, -1],
+        quaternion: [0, 0, 0, 1],
+        levitating: true,
+        frozen: false
+      },
+      {
+        id: '_4',
+        model: 'rock-black',
+        position: [1, NEW_STONE_HEIGHT, -1],
+        quaternion: [0, 0, 0, 1],
+        levitating: true,
+        frozen: false
+      },
+    ];
+
+    newBoulders.forEach(item => {
+      set(store => {
+        store.items[item.id] = item;
+      });
+    });
   }, [set]);
 }
 
 export function World({
   type
 }) {
-  useLoadStones();
+  useInitStones();
+  useInitNewStones();
   
   const itemIds = useItemStore(store => Object.keys(store.items));
   return (
