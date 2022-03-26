@@ -2,6 +2,7 @@
   "name": "reality-hack-22",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://reality-hack-2022.github.io/TEAM-25/",
   "dependencies": {
     "@react-three/cannon": "^5.1.0",
     "@react-three/drei": "^8.19.0",
@@ -25,6 +26,8 @@
     "zustand": "^3.7.1"
   },
   "scripts": {
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
