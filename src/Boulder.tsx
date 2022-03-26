@@ -5,29 +5,32 @@ import { Object3D } from "three";
 import { useItemStore } from "./item-store";
 import { Grab } from "./lib/react-xr-default-hands/Grab";
 
-const CUBE_SIZE = 0.3;
 const CUBE_MASS = 1;
 
 const boulderMetadata = {
   'rock-big': {
     path: '/models/rock-big.gltf',
     objectName: 'Object123',
-    materialName: 'skatter_rock_01 [imported]'
+    materialName: 'skatter_rock_01 [imported]',
+    physicsBox: [0.3, 0.3, 0.3]
   },
   'rock-black': {
     path: '/models/rock-black.glb',
     objectName: 'Object074',
-    materialName: 'skatter_gravel_01'
+    materialName: 'skatter_gravel_01',
+    physicsBox: [0.3, 0.3, 0.3]
   },
   'rock-gray': {
     path: '/models/rock-gray.gltf',
     objectName: 'Object065',
-    materialName: 'skatter_gravel_01'
+    materialName: 'skatter_gravel_01',
+    physicsBox: [0.3, 0.3, 0.3]
   },
   'rock-irregular': {
     path: '/models/rock-irregular.gltf',
     objectName: 'Object034',
-    materialName: 'skatter_gravel_01'
+    materialName: 'skatter_gravel_01',
+    physicsBox: [0.3, 0.3, 0.3]
   },
 }
 
@@ -55,10 +58,12 @@ export function Boulder({itemId, ...props}) {
 
   const [ref, api] = useBox(() => {
     const options: any = {
-      args: [CUBE_SIZE, CUBE_SIZE, CUBE_SIZE], position: item.position, quaternion: item.quaternion,
-      type: item.frozen ? 'Kinematic' : 'Dynamic'
+      args: boulderMetadata[item.model].physicsBox,
+      position: item.position,
+      quaternion: item.quaternion,
+      type: item.frozen ? 'Static' : 'Dynamic',
     };
-
+    
     if(!item.frozen) {
       options.mass = CUBE_MASS;
       options.sleepSpeedLimit = 0.2;
@@ -105,9 +110,12 @@ export function Boulder({itemId, ...props}) {
   }, [isGrabbing, api, item.frozen])
   
 
-  return <Grab physicsApi={api} disabled={item.frozen} onChange={({isGrabbed}) => {
+  const model = <BoulderModel ref={ref} type={item.model}/>;
+
+  return !item.frozen ? 
+    <Grab physicsApi={api} disabled={item.frozen} onChange={({isGrabbed}) => {
     setIsGrabbing(isGrabbed);
   }}>
-    <BoulderModel ref={ref} type={item.model}/>
-  </Grab>;
+    {model}
+  </Grab> : model;
 }

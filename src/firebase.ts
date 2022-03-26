@@ -37,9 +37,7 @@ export const getStones = async () => {
   const stones: ItemState[] = [];
 
   querySnapshot.forEach((doc) => {
-    console.log(doc);
     const stone = {id: doc.id, ...doc.data()};
-    console.log(stone);
     stones.push(stone as unknown as ItemState);
   });
   return stones;

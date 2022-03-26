@@ -2,7 +2,7 @@ import { usePlane } from "@react-three/cannon";
 import { Plane } from "@react-three/drei";
 
 export function Floor({invisible, ...props}) {
-    const [ref] = usePlane(() => ({ ...props }));
+    const [ref] = usePlane(() => ({ ...props, type: 'Static' }));
   
     return <Plane ref={ref} args={[10,10]} receiveShadow>
       {
