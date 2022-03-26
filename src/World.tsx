@@ -14,7 +14,10 @@ function useInitStones() {
       const items = await getStones();
       for(const item of items) {
         set(store => {
-          store.items[item.id] = item;
+          const current = store.items[item.id];
+          store.items[item.id] = Object.assign({}, current ?? {}, item, 
+            {frozen: (current?.frozen ?? true) && item.frozen } // only apply frozen for external items
+            );
         });
       }
     }

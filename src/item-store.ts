@@ -11,15 +11,18 @@ const immer =
 
 setAutoFreeze(false)
 
-export interface ItemState {
-    id?: string;
+export interface PersistentItemState {
+  id?: string;
+  position: [number, number, number];
+  quaternion: [number, number, number, number];
+  frozen: boolean;
+  model: string;
+}
+export interface ItemState extends PersistentItemState {
+    // id?: string;
     api?: PublicApi;
-    position: [number, number, number];
-    quaternion: [number, number, number, number];
-    frozen: boolean;
     levitating?: boolean;
     touched?: boolean;
-    model: string;
 }
 
 export type State = {
