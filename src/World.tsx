@@ -4,11 +4,13 @@ import { Floor } from "./Floor";
 import { useItemStore } from "./item-store";
 import { TestCube } from "./TestCube";
 
-export function World() {
+export function World({
+  type
+}) {
   const itemIds = useItemStore(store => store.itemIds);
   return (
     <Physics allowSleep>
-      <Floor rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} />
+      <Floor invisible={type === 'ar'} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} />
 
 <Suspense fallback={null}>
       {
