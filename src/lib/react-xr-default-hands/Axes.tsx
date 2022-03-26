@@ -91,15 +91,19 @@ export function Axes({ controller, model, useGuides = false }: Props) {
 
   return (
     <group>
-      <mesh ref={thumbTipRef} geometry={new SphereGeometry(0.005)} material={new MeshBasicMaterial({ color: 'blue' })} />
-      <mesh ref={thumbJointRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'brown' })} />
-      <mesh ref={thumbTipCollidingRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'orange' })} />
-      <mesh ref={indexTipRef} geometry={new SphereGeometry(0.005)} material={new MeshBasicMaterial({ color: 'blue' })} />
-      <mesh ref={indexJointRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'brown' })} />
-      <mesh ref={indexTipCollidingRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'orange' })} />
-      <mesh ref={indexKnuckleRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'green' })} />
-      <mesh ref={pinkyKnuckleRef} geometry={new SphereGeometry(0.01)} material={new MeshBasicMaterial({ color: 'green' })} />
-      <mesh ref={positionRef} geometry={new SphereGeometry(0.005)} material={new MeshBasicMaterial({ color: 'white' })} />
+      {useGuides && 
+        <>
+        <mesh ref={thumbTipRef} geometry={new SphereGeometry(0.0000001)} material={new MeshBasicMaterial({ color: 'blue' })} />
+        <mesh ref={thumbJointRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'brown' })} />
+        <mesh ref={thumbTipCollidingRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'orange' })} />
+        <mesh ref={indexTipRef} geometry={new SphereGeometry(0.0000005)} material={new MeshBasicMaterial({ color: 'blue' })} />
+        <mesh ref={indexJointRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'brown' })} />
+        <mesh ref={indexTipCollidingRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'orange' })} />
+        <mesh ref={indexKnuckleRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'green' })} />
+        <mesh ref={pinkyKnuckleRef} geometry={new SphereGeometry(0.000001)} material={new MeshBasicMaterial({ color: 'green' })} />
+        <mesh ref={positionRef} geometry={new SphereGeometry(0.000000005)} material={new MeshBasicMaterial({ color: 'white' })} />
+        </>
+      }
 
       {useGuides && (
         <>
