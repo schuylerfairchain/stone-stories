@@ -167,5 +167,8 @@ function App() {
 
 useGLTF.preload(process.env.PUBLIC_URL + "/newPiles.gltf");
 useGLTF.preload(process.env.PUBLIC_URL + "/Piles-big.gltf");
+useGLTF.preload(process.env.PUBLIC_URL + "/rock-irregular.gltf");
+useGLTF.preload(process.env.PUBLIC_URL + "/rock-gray.gltf");
+useGLTF.preload(process.env.PUBLIC_URL + "/rock-black.gltf");
 
 export default App;
