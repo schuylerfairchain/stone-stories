@@ -1,6 +1,6 @@
 import { useBox } from "@react-three/cannon";
 import { useGLTF } from "@react-three/drei";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Object3D } from "three";
 import { addStone, updateStone } from "./firebase";
 import { PersistentItemState, useItemStore } from "./item-store";
@@ -8,7 +8,15 @@ import { Grab } from "./lib/react-xr-default-hands/Grab";
 
 const CUBE_MASS = 1;
 
-const boulderMetadata = {
+
+interface BoulderMetadata {
+  path: string;
+  objectName: string;
+  materialName: string;
+  physicsBox: [number, number, number]
+}
+
+const boulderMetadata: Record<string, BoulderMetadata> = {
   'rock-big': {
     path: '/models/rock-big.gltf',
     objectName: 'Object123',
@@ -44,11 +52,20 @@ function assetUrl(path) {
   return process.env.PUBLIC_URL + path;
 }
 
-const BoulderModel = forwardRef<Object3D, {type: string} & any>(({type, ...rest}, ref) => {
-  const metadata = boulderMetadata[type];
-  const {nodes, materials} = useGLTF(assetUrl(metadata.path));
 
-  return <mesh ref={ref} {...rest} castShadow geometry={(nodes[metadata.objectName] as any).geometry} material={materials[metadata.materialName]}/>;
+function useBoulderModel({path, materialName, objectName}: BoulderMetadata) {
+  const {nodes,materials}= useGLTF(assetUrl(path)) as any;
+
+  return useMemo(() => ({object: (nodes[objectName] as any), material: materials[materialName].clone()}), [nodes, objectName, materials, materialName]);
+}
+
+const BoulderModel = forwardRef<Object3D, {type: string; virtual: boolean} & any>(({type, virtual=false, ...rest}, ref) => {
+  const metadata = boulderMetadata[type];
+  const {object, material} = useBoulderModel(metadata);
+
+  return <mesh ref={ref} {...rest} castShadow={!virtual} geometry={object.geometry} material={material} 
+  material-transparent={virtual} material-opacity={virtual ? 0.3: 1}
+  />;
 });
 
 function isStatic([x, y, z]) {
@@ -191,7 +208,7 @@ export function Boulder({itemId, ...props}) {
   
   useBoulderUpload(item, api, set);
 
-  const model = <BoulderModel ref={ref} type={item.model}/>;
+  const model = <BoulderModel ref={ref} type={item.model} virtual={!item.touched && item.id.startsWith('_')}/>;
 
   return !item.frozen ? 
     <Grab physicsApi={api} onChange={({isGrabbed}) => {
