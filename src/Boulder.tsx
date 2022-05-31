@@ -77,6 +77,7 @@ async function uploadBoulder(item, set) {
       });
     }
   } else {
+    stoneData.id = item.id;
     await updateStone(stoneData);
   }
 }
