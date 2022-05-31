@@ -1,10 +1,10 @@
 import { useBox } from "@react-three/cannon";
 import { useGLTF } from "@react-three/drei";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import { Object3D } from "three";
-import { addStone, updateStone } from "./firebase";
-import { PersistentItemState, useItemStore } from "./item-store";
+import { useItemStore } from "./item-store";
 import { Grab } from "./lib/react-xr-default-hands/Grab";
+import { useStoneUpload } from "./stones/stone-upload";
 
 const CUBE_MASS = 1;
 
@@ -68,64 +68,6 @@ const BoulderModel = forwardRef<Object3D, {type: string; virtual: boolean} & any
   />;
 });
 
-function isStatic([x, y, z]) {
-  return (isNaN(x) && isNaN(y) && isNaN(z)) ||
-  (x === 0 && y === 0 && z === 0);
-}
-
-async function uploadBoulder(item, set) {
-  console.log('Uploading boulder', item);
-  const stoneData: PersistentItemState = {
-    position: item.position,
-    quaternion: item.quaternion,
-    model: item.model,
-    frozen: true
-  };
-  if(item.id.startsWith('_')) {
-    const id = await addStone(stoneData);
-
-    if(id) {
-      set(store => {
-        store.items[id] = {
-          ...item,
-          id
-        };
-        delete store.items[item.id];
-      });
-    }
-  } else {
-    stoneData.id = item.id;
-    await updateStone(stoneData);
-  }
-}
-
-function useBoulderUpload(item, api, set) {
-  const isDirty = useRef<boolean>();
-  const previousStatic = useRef<boolean>(true);
-  
-  useEffect(() => {
-    if(!api || !set) return;
-    return api.velocity.subscribe(velocity => {
-      const isStaticTest = isStatic(velocity);
-      if(item.touched) {
-        if(!isStaticTest) {
-          if(previousStatic.current) {
-            isDirty.current = true;
-          }
-        } else {
-          if(isDirty.current) {
-            console.log(`Uploading ${item.id}`);
-
-            uploadBoulder(item, set);
-            isDirty.current = false;
-          }
-        }
-
-          previousStatic.current = isStaticTest;
-        }
-    })
-  }, [api, item, set]);
-}
 
 export function Boulder({itemId, ...props}) {
   const set = useItemStore((store) => store.set);
@@ -206,7 +148,7 @@ export function Boulder({itemId, ...props}) {
     }
   }, [isGrabbing, api, item.frozen, item.levitating, set, itemId, item.touched, item]);
   
-  useBoulderUpload(item, api, set);
+  useStoneUpload(item, api, set);
 
   const model = <BoulderModel ref={ref} type={item.model} virtual={!item.touched && item.id.startsWith('_')}/>;
 
