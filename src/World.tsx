@@ -2,7 +2,7 @@ import { Physics } from "@react-three/cannon";
 import { Suspense, useEffect } from "react";
 import { Floor } from "./Floor";
 import { ItemState, useItemStore } from "./item-store";
-import { Boulder } from "./Boulder";
+import { Stone } from "./Stone";
 import { getStones } from "./firebase";
 
 function useInitStones() {
@@ -32,7 +32,7 @@ function useInitNewStones() {
 
   useEffect(() => {
     if(!set) return;
-    const newBoulders: ItemState[] = [
+    const newStones: ItemState[] = [
       {
         id: '_1',
         model: 'rock-irregular',
@@ -67,7 +67,7 @@ function useInitNewStones() {
       },
     ];
 
-    newBoulders.forEach(item => {
+    newStones.forEach(item => {
       set(store => {
         store.items[item.id] = item;
       });
@@ -88,7 +88,7 @@ export function World({
 
 <Suspense fallback={null}>
       {
-        itemIds.map(itemId => <Boulder key={itemId} itemId={itemId} />)
+        itemIds.map(itemId => <Stone key={itemId} itemId={itemId} />)
       }
   </Suspense>
     </Physics>
