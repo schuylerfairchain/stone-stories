@@ -1,60 +1,60 @@
-import { useBox } from "@react-three/cannon";
-import { useEffect } from "react";
-import { useItemStore } from "../item-store";
-import { stoneMetadata } from "./StoneModel";
+import { useBox } from '@react-three/cannon';
+import { useEffect } from 'react';
+import { useItemStore } from '../item-store';
+import { stoneMetadata } from './StoneModel';
 
 export const STONE_MASS = 1;
 
-
 export function useStonePhysics(itemId) {
-    const set = useItemStore((store) => store.set);
-  const item = useItemStore(store => store.items[itemId]);
+  const set = useItemStore((store) => store.set);
+  const item = useItemStore((store) => store.items[itemId]);
 
+  const [ref, api] = useBox(
+    () => {
+      const options: any = {
+        args: stoneMetadata[item.model].physicsBox,
+        position: item.position,
+        quaternion: item.quaternion,
+      };
 
-  const [ref, api] = useBox(() => {
-    const options: any = {
-      args: stoneMetadata[item.model].physicsBox,
-      position: item.position,
-      quaternion: item.quaternion,
-    };
-    
-    if(!item.frozen && !item.levitating) {
-      options.mass = STONE_MASS;
-      options.sleepSpeedLimit = 0.5;
-    }
-    
-    return options;
-  }, null, [item.frozen, item.levitating]);
+      if (!item.frozen && !item.levitating) {
+        options.mass = STONE_MASS;
+        options.sleepSpeedLimit = 0.5;
+      }
 
+      return options;
+    },
+    null,
+    [item.frozen, item.levitating],
+  );
 
   useEffect(() => {
-    if(!api) return;
+    if (!api) return;
 
-    set(store => {
+    set((store) => {
       store.items[itemId].api = api;
-    })
+    });
   }, [api, itemId, set]);
 
   useEffect(() => {
     return api?.position.subscribe((position) => {
-      set(store => {
-        if(store.items[itemId]) {
-        store.items[itemId].position = position
+      set((store) => {
+        if (store.items[itemId]) {
+          store.items[itemId].position = position;
         }
       });
     });
-  }, [api, itemId, set])
+  }, [api, itemId, set]);
 
   useEffect(() => {
-    return  api?.quaternion.subscribe((quaternion) => {
-      set(store => {
-        if(store.items[itemId]) {
-
-        store.items[itemId].quaternion = quaternion
+    return api?.quaternion.subscribe((quaternion) => {
+      set((store) => {
+        if (store.items[itemId]) {
+          store.items[itemId].quaternion = quaternion;
         }
       });
-    })
-  }, [api, itemId, set])
+    });
+  }, [api, itemId, set]);
 
   return [ref, api] as const;
 }

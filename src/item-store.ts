@@ -1,15 +1,15 @@
-import { PublicApi } from '@react-three/cannon'
-import produce, { setAutoFreeze } from 'immer'
-import createStore, { State as ZustandState, StateCreator } from 'zustand'
+import { PublicApi } from '@react-three/cannon';
+import produce, { setAutoFreeze } from 'immer';
+import createStore, { State as ZustandState, StateCreator } from 'zustand';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const immer =
   <T extends ZustandState>(config: StateCreator<T, (fn: (state: T) => void) => void>): StateCreator<T> =>
   (set, get, api) =>
-    config((fn) => set(produce(fn) as (state: T) => T), get, api)
+    config((fn) => set(produce(fn) as (state: T) => T), get, api);
 
-setAutoFreeze(false)
+setAutoFreeze(false);
 
 export interface PersistentItemState {
   id?: string;
@@ -19,16 +19,16 @@ export interface PersistentItemState {
   model: string;
 }
 export interface ItemState extends PersistentItemState {
-    // id?: string;
-    api?: PublicApi;
-    levitating?: boolean;
-    touched?: boolean;
+  // id?: string;
+  api?: PublicApi;
+  levitating?: boolean;
+  touched?: boolean;
 }
 
 export type State = {
   items: Record<string, ItemState>;
-  set: (fn: (state: State) => void | State) => void
-}
+  set: (fn: (state: State) => void | State) => void;
+};
 
 /*a: {
           position: [0, 0.9, -0.3],
@@ -58,8 +58,8 @@ export const useItemStore = createStore<State>(
     return {
       items: {} as Record<string, ItemState>,
       set: (fn: (state: State) => State | void) => {
-        set(fn)
-      }
-    }
-  })
-)
+        set(fn);
+      },
+    };
+  }),
+);

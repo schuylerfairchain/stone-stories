@@ -1,23 +1,26 @@
-import { Physics } from "@react-three/cannon";
-import { Suspense, useEffect } from "react";
-import { Floor } from "./Floor";
-import { ItemState, useItemStore } from "./item-store";
-import { Stone } from "./Stone";
-import { getStones } from "./firebase";
+import { Physics } from '@react-three/cannon';
+import { Suspense, useEffect } from 'react';
+import { Floor } from './Floor';
+import { ItemState, useItemStore } from './item-store';
+import { Stone } from './Stone';
+import { getStones } from './firebase';
 
 function useInitStones() {
-  const set = useItemStore(store => store.set);
+  const set = useItemStore((store) => store.set);
 
   useEffect(() => {
-    if(!set) return;
+    if (!set) return;
     async function load() {
       const items = await getStones();
-      for(const item of items) {
-        set(store => {
+      for (const item of items) {
+        set((store) => {
           const current = store.items[item.id];
-          store.items[item.id] = Object.assign({}, current ?? {}, item, 
-            {frozen: (current?.frozen ?? true) && item.frozen } // only apply frozen for external items
-            );
+          store.items[item.id] = Object.assign(
+            {},
+            current ?? {},
+            item,
+            { frozen: (current?.frozen ?? true) && item.frozen }, // only apply frozen for external items
+          );
         });
       }
     }
@@ -28,10 +31,10 @@ function useInitStones() {
 const NEW_STONE_HEIGHT = 1.2;
 
 function useInitNewStones() {
-  const set = useItemStore(store => store.set);
+  const set = useItemStore((store) => store.set);
 
   useEffect(() => {
-    if(!set) return;
+    if (!set) return;
     const newStones: ItemState[] = [
       {
         id: '_1',
@@ -39,7 +42,7 @@ function useInitNewStones() {
         position: [-0.5, NEW_STONE_HEIGHT, -1],
         quaternion: [0, 0, 0, 1],
         levitating: true,
-        frozen: false
+        frozen: false,
       },
       {
         id: '_2',
@@ -47,7 +50,7 @@ function useInitNewStones() {
         position: [-1, NEW_STONE_HEIGHT, -1],
         quaternion: [0, 0, 0, 1],
         levitating: true,
-        frozen: false
+        frozen: false,
       },
       {
         id: '_3',
@@ -55,7 +58,7 @@ function useInitNewStones() {
         position: [0.2, NEW_STONE_HEIGHT, -1],
         quaternion: [0, 0, 0, 1],
         levitating: true,
-        frozen: false
+        frozen: false,
       },
       {
         id: '_4',
@@ -63,34 +66,32 @@ function useInitNewStones() {
         position: [1, NEW_STONE_HEIGHT, -1],
         quaternion: [0, 0, 0, 1],
         levitating: true,
-        frozen: false
+        frozen: false,
       },
     ];
 
-    newStones.forEach(item => {
-      set(store => {
+    newStones.forEach((item) => {
+      set((store) => {
         store.items[item.id] = item;
       });
     });
   }, [set]);
 }
 
-export function World({
-  type
-}) {
+export function World({ type }) {
   useInitStones();
   useInitNewStones();
-  
-  const itemIds = useItemStore(store => Object.keys(store.items));
+
+  const itemIds = useItemStore((store) => Object.keys(store.items));
   return (
     <Physics allowSleep>
       <Floor invisible={type === 'ar'} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} />
 
-<Suspense fallback={null}>
-      {
-        itemIds.map(itemId => <Stone key={itemId} itemId={itemId} />)
-      }
-  </Suspense>
+      <Suspense fallback={null}>
+        {itemIds.map((itemId) => (
+          <Stone key={itemId} itemId={itemId} />
+        ))}
+      </Suspense>
     </Physics>
   );
 }
