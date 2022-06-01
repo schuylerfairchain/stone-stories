@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useItemStore } from './item-store';
-import { Grab } from './lib/react-xr-default-hands/Grab';
-import { StoneModel } from './stones/StoneModel';
-import { useStoneUpload } from './stones/stone-upload';
-import { STONE_MASS, useStonePhysics } from './stones/use-stone-physics';
+import { useItemStore } from '../item-store';
+import { Grab } from '../lib/react-xr-default-hands/Grab';
+import { StoneModel } from './StoneModel';
+import { useStoneUpload } from './stone-upload';
+import { STONE_MASS, useStonePhysics } from './use-stone-physics';
 
 export function Stone({ itemId, ...props }) {
   const set = useItemStore((store) => store.set);

@@ -2,7 +2,7 @@ import { Physics } from '@react-three/cannon';
 import { Suspense, useEffect } from 'react';
 import { Floor } from './Floor';
 import { ItemState, useItemStore } from './item-store';
-import { Stone } from './Stone';
+import { Stone } from './stones/Stone';
 import { getStones } from './firebase';
 
 function useInitStones() {
