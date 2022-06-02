@@ -40,7 +40,7 @@ function useInitNewStones() {
         id: '_1',
         model: 'rock-irregular',
         position: [-0.5, NEW_STONE_HEIGHT, -1],
-        quaternion: [0, 0, 0, 1],
+        rotation: [0, 0, 0],
         levitating: true,
         frozen: false,
       },
@@ -48,7 +48,7 @@ function useInitNewStones() {
         id: '_2',
         model: 'rock-big',
         position: [-1, NEW_STONE_HEIGHT, -1],
-        quaternion: [0, 0, 0, 1],
+        rotation: [0, 0, 0],
         levitating: true,
         frozen: false,
       },
@@ -56,7 +56,7 @@ function useInitNewStones() {
         id: '_3',
         model: 'rock-gray',
         position: [0.2, NEW_STONE_HEIGHT, -1],
-        quaternion: [0, 0, 0, 1],
+        rotation: [0, 0, 0],
         levitating: true,
         frozen: false,
       },
@@ -64,7 +64,7 @@ function useInitNewStones() {
         id: '_4',
         model: 'rock-black',
         position: [1, NEW_STONE_HEIGHT, -1],
-        quaternion: [0, 0, 0, 1],
+        rotation: [0, 0, 0],
         levitating: true,
         frozen: false,
       },
@@ -86,7 +86,6 @@ export function World({ type }) {
   return (
     <Physics allowSleep>
       <Floor invisible={type === 'ar'} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} />
-
       <Suspense fallback={null}>
         {itemIds.map((itemId) => (
           <Stone key={itemId} itemId={itemId} />

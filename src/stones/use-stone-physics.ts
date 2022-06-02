@@ -14,7 +14,7 @@ export function useStonePhysics(itemId) {
       const options: any = {
         args: stoneMetadata[item.model].physicsBox,
         position: item.position,
-        quaternion: item.quaternion,
+        rotation: item.rotation,
       };
 
       if (!item.frozen && !item.levitating) {
@@ -47,10 +47,10 @@ export function useStonePhysics(itemId) {
   }, [api, itemId, set]);
 
   useEffect(() => {
-    return api?.quaternion.subscribe((quaternion) => {
+    return api?.rotation.subscribe((r) => {
       set((store) => {
         if (store.items[itemId]) {
-          store.items[itemId].quaternion = quaternion;
+          store.items[itemId].rotation = r;
         }
       });
     });

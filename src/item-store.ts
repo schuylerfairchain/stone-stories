@@ -5,7 +5,9 @@ import createStore, { State as ZustandState, StateCreator } from 'zustand';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const immer =
-  <T extends ZustandState>(config: StateCreator<T, (fn: (state: T) => void) => void>): StateCreator<T> =>
+  <T extends ZustandState>(
+    config: StateCreator<T, (fn: (state: T) => void) => void>,
+  ): StateCreator<T> =>
   (set, get, api) =>
     config((fn) => set(produce(fn) as (state: T) => T), get, api);
 
@@ -14,7 +16,7 @@ setAutoFreeze(false);
 export interface PersistentItemState {
   id?: string;
   position: [number, number, number];
-  quaternion: [number, number, number, number];
+  rotation: [number, number, number];
   frozen: boolean;
   model: string;
 }

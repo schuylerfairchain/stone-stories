@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useXR, useXREvent, XRController, XREvent } from '@react-three/xr';
 import React, { forwardRef, ReactNode, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
-import { Box3, Matrix3, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from 'three';
+import { Box3, Euler, Matrix3, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from 'three';
 import { OBB } from 'three/examples/jsm/math/OBB';
 
 import { HandModel } from './HandModel';
@@ -23,7 +23,13 @@ export const Grab = forwardRef(
       children: ReactNode;
       physicsApi: PublicApi;
       disabled?: boolean;
-      onChange?: ({ isGrabbed, controller }: { isGrabbed: boolean; controller: XRController }) => void;
+      onChange?: ({
+        isGrabbed,
+        controller,
+      }: {
+        isGrabbed: boolean;
+        controller: XRController;
+      }) => void;
       callback?: ({ controller, model }: { controller: XRController; model: HandModel }) => boolean;
     },
     passedRef,
@@ -49,7 +55,8 @@ export const Grab = forwardRef(
         ((isHandTracking && e.originalEvent.fake) || !isHandTracking)
       ) {
         set((store) => {
-          store.hands.interacting!.current[grabbingController.current!.inputSource.handedness] = undefined;
+          store.hands.interacting!.current[grabbingController.current!.inputSource.handedness] =
+            undefined;
         });
         grabbingController.current = undefined;
         previousTransform.current = undefined;
@@ -60,7 +67,11 @@ export const Grab = forwardRef(
     useXREvent('selectstart', (e: XREvent) => {
       // if the controller is already interacting, don't do anything
       // if hand tracking is enabled, but it's not a fake event, don't do anything
-      if (disabled || interacting[e.controller.inputSource.handedness] || (isHandTracking && !e.originalEvent.fake)) {
+      if (
+        disabled ||
+        interacting[e.controller.inputSource.handedness] ||
+        (isHandTracking && !e.originalEvent.fake)
+      ) {
         return;
       }
 
@@ -90,14 +101,21 @@ export const Grab = forwardRef(
 
         const obb = new OBB(
           new Vector3().setFromMatrixPosition(mesh.matrixWorld),
-          (mesh.geometry!.boundingBox as Box3).getSize(new Vector3()).multiply(mesh.scale).divideScalar(2),
+          (mesh.geometry!.boundingBox as Box3)
+            .getSize(new Vector3())
+            .multiply(mesh.scale)
+            .divideScalar(2),
           new Matrix3().setFromMatrix4(mesh.matrixWorld.clone().makeScale(1, 1, 1)),
         );
 
         const matrix = model!.getHandRotationMatrix();
 
-        const indexTip = model!.bones.find((bone) => (bone as any).jointName === 'index-finger-tip')! as Object3D;
-        const thumbTip = model!.bones.find((bone) => (bone as any).jointName === 'thumb-tip')! as Object3D;
+        const indexTip = model!.bones.find(
+          (bone) => (bone as any).jointName === 'index-finger-tip',
+        )! as Object3D;
+        const thumbTip = model!.bones.find(
+          (bone) => (bone as any).jointName === 'thumb-tip',
+        )! as Object3D;
 
         const thumbOBB = new OBB(
           indexTip.getWorldPosition(new Vector3()),
@@ -110,7 +128,9 @@ export const Grab = forwardRef(
           new Matrix3().setFromMatrix4(matrix),
         );
 
-        colliding = obb.intersectsOBB(thumbOBB, Number.EPSILON) && obb.intersectsOBB(indexOBB, Number.EPSILON);
+        colliding =
+          obb.intersectsOBB(thumbOBB, Number.EPSILON) &&
+          obb.intersectsOBB(indexOBB, Number.EPSILON);
       } else {
         colliding = callback({ controller: e.controller, model: model });
       }
@@ -120,7 +140,8 @@ export const Grab = forwardRef(
         const transform = model.getHandTransform();
         previousTransform.current = transform.clone();
         set((store) => {
-          store.hands.interacting!.current[grabbingController.current.inputSource.handedness] = ref.current;
+          store.hands.interacting!.current[grabbingController.current.inputSource.handedness] =
+            ref.current;
         });
         onChange?.({ isGrabbed: true, controller: e.controller });
       }
@@ -145,7 +166,11 @@ export const Grab = forwardRef(
       if (isHandTracking) {
         // get quaternion from previous matrix
         const previousQuaternion = new Quaternion();
-        previousTransform.current.decompose(new Vector3(), previousQuaternion, new Vector3(1, 1, 1));
+        previousTransform.current.decompose(
+          new Vector3(),
+          previousQuaternion,
+          new Vector3(1, 1, 1),
+        );
 
         // get quaternion from current matrix
         const currentQuaternion = new Quaternion();
@@ -158,10 +183,10 @@ export const Grab = forwardRef(
         transform = new Matrix4().compose(position, previousQuaternion, new Vector3(1, 1, 1));
       }
       const pos = new Vector3().setFromMatrixPosition(transform);
-      const rot = new Quaternion().setFromRotationMatrix(transform);
+      const rot = new Euler().setFromRotationMatrix(transform);
 
       physicsApi.position.set(pos.x, pos.y, pos.z);
-      physicsApi.quaternion.set(rot.x, rot.y, rot.z, rot.w);
+      physicsApi.rotation.set(rot.x, rot.y, rot.z);
 
       previousTransform.current = transform.clone();
     });

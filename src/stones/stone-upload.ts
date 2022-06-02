@@ -6,7 +6,7 @@ export async function uploadStone(item, set) {
   console.log('Uploading boulder', item);
   const stoneData: PersistentItemState = {
     position: item.position,
-    quaternion: item.quaternion,
+    rotation: item.rotation,
     model: item.model,
     frozen: true,
   };

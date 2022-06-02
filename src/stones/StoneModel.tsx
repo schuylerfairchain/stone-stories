@@ -14,7 +14,7 @@ export const stoneMetadata: Record<string, StoneMetadata> = {
     path: '/models/rock-big.gltf',
     objectName: 'Object123',
     materialName: 'skatter_rock_01 [imported]',
-    physicsBox: [0.3, 0.3, 0.3],
+    physicsBox: [0.3, 0.25, 0.3],
   },
   'rock-black': {
     path: '/models/rock-black.glb',
