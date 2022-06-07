@@ -1,7 +1,15 @@
 import { useFrame } from '@react-three/fiber';
 import { XRController } from '@react-three/xr';
 import React, { useRef } from 'react';
-import { BufferGeometry, LineBasicMaterial, Mesh, MeshBasicMaterial, Object3D, SphereGeometry, Vector3 } from 'three';
+import {
+  BufferGeometry,
+  LineBasicMaterial,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+  SphereGeometry,
+  Vector3,
+} from 'three';
 
 import { HandModel } from './HandModel';
 
@@ -17,13 +25,19 @@ export function Axes({ controller, model, useGuides = false }: Props) {
       return;
     }
 
-    const indexTip = model!.bones.find((bone) => (bone as any).jointName === 'index-finger-tip')! as Object3D;
-    const thumbTip = model!.bones.find((bone) => (bone as any).jointName === 'thumb-tip')! as Object3D;
+    const indexTip = model!.bones.find(
+      (bone) => (bone as any).jointName === 'index-finger-tip',
+    )! as Object3D;
+    const thumbTip = model!.bones.find(
+      (bone) => (bone as any).jointName === 'thumb-tip',
+    )! as Object3D;
 
     const indexJoint = model!.bones.find(
       (bone) => (bone as any).jointName === 'index-finger-phalanx-proximal',
     )! as Object3D;
-    const thumbJoint = model!.bones.find((bone) => (bone as any).jointName === 'thumb-phalanx-proximal')! as Object3D;
+    const thumbJoint = model!.bones.find(
+      (bone) => (bone as any).jointName === 'thumb-phalanx-proximal',
+    )! as Object3D;
 
     const position: Vector3 = indexTip
       .getWorldPosition(new Vector3())
@@ -45,9 +59,13 @@ export function Axes({ controller, model, useGuides = false }: Props) {
     pinkyKnuckleRef.current?.position.copy(pinkyKnuckle.getWorldPosition(new Vector3()));
     positionRef.current?.position.copy(position.clone());
 
-    const z = thumbJoint.getWorldPosition(new Vector3()).sub(indexJoint.getWorldPosition(new Vector3())).normalize();
+    const z = thumbJoint
+      .getWorldPosition(new Vector3())
+      .sub(indexJoint.getWorldPosition(new Vector3()))
+      .normalize();
 
     const zPoints: Vector3[] = [position.clone(), position.clone().add(z)];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const zGeom = new BufferGeometry().setFromPoints(zPoints);
     //zRef.current.geometry = zGeom
 
@@ -66,23 +84,31 @@ export function Axes({ controller, model, useGuides = false }: Props) {
     const x = new Vector3().crossVectors(z, y).negate();
 
     const xPoints: Vector3[] = [position.clone(), position.clone().add(x.clone())];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const xGeom = new BufferGeometry().setFromPoints(xPoints);
     //xRef.current.geometry = xGeom
 
     const y2 = new Vector3().crossVectors(x, z).negate();
 
     const y2Points: Vector3[] = [position.clone(), position.clone().add(y2.clone())];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const y2Geom = new BufferGeometry().setFromPoints(y2Points);
     //y2Ref.current.geometry = y2Geom
 
-    const distance = indexTip.getWorldPosition(new Vector3()).sub(thumbTip.getWorldPosition(new Vector3()));
+    const distance = indexTip
+      .getWorldPosition(new Vector3())
+      .sub(thumbTip.getWorldPosition(new Vector3()));
 
     thumbTipCollidingRef.current?.position.copy(
-      thumbTip.getWorldPosition(new Vector3()).add(new Vector3().copy(distance.clone().divideScalar(20))),
+      thumbTip
+        .getWorldPosition(new Vector3())
+        .add(new Vector3().copy(distance.clone().divideScalar(20))),
     );
 
     indexTipCollidingRef.current?.position.copy(
-      indexTip.getWorldPosition(new Vector3()).sub(new Vector3().copy(distance.clone().divideScalar(20))),
+      indexTip
+        .getWorldPosition(new Vector3())
+        .sub(new Vector3().copy(distance.clone().divideScalar(20))),
     );
   });
 

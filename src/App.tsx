@@ -50,7 +50,7 @@ function XRButton({ gl, onConfiguration }) {
         await gl.xr.setSession(session);
       }
     }
-  }, [gl]);
+  }, [gl.xr, onConfiguration]);
 
   return (
     <button
@@ -101,7 +101,7 @@ function XRCanvas({ children, onConfiguration, ...rest }) {
           </InteractionManager>
         </XR>
       </Canvas>
-      {!isPresenting && <XRButton gl={gl} onConfiguration={onConfiguration} />}
+      {!isPresenting && gl && <XRButton gl={gl} onConfiguration={onConfiguration} />}
     </>
   );
 }
@@ -117,7 +117,12 @@ function App() {
             <>
               <DefaultHandControllers />
               <ambientLight name="main-ambient-light" intensity={0.3} />
-              <pointLight name="main-point-light" intensity={1.5} position={[0, 3, -2]} castShadow />
+              <pointLight
+                name="main-point-light"
+                intensity={1.5}
+                position={[0, 3, -2]}
+                castShadow
+              />
 
               <World type={configurationChosen.sessionType === 'immersive-vr' ? 'vr' : 'ar'} />
             </>
