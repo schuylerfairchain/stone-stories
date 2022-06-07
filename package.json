@@ -1,8 +1,8 @@
 {
-  "name": "reality-hack-22",
+  "name": "stone-stories",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://reality-hack-2022.github.io/TEAM-25/",
+  "homepage": "https://mz8i.com/stone-stories",
   "dependencies": {
     "@react-three/cannon": "^5.1.0",
     "@react-three/drei": "^8.19.0",
