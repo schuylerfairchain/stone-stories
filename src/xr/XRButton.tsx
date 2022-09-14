@@ -31,7 +31,7 @@ export function XRButton({ gl, configurations, onConfiguration, buttonContent })
     <button
       style={{
         position: 'absolute',
-        bottom: 20,
+        bottom: 'calc(10%)',
         left: 'calc(50% - 75px)',
         width: 150,
         height: '2em',

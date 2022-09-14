@@ -1,6 +1,7 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { InteractionManager, useXR, XR } from '@react-three/xr';
 import { useEffect, useState } from 'react';
+import { LatoText } from '../ui/LatoText';
 import { XRButton } from './XRButton';
 
 function XRWatch({ onGl, onIsPresenting }) {
@@ -25,6 +26,7 @@ export function XRCanvas({ children, configurations, onConfiguration, buttonCont
   return (
     <>
       <Canvas id="vr" vr {...rest}>
+        {!isPresenting && <LatoText textToDisplay="STONE STORIES" />}
         <XR>
           <InteractionManager>
             <XRWatch onGl={setGl} onIsPresenting={setIsPresenting} />
@@ -32,13 +34,20 @@ export function XRCanvas({ children, configurations, onConfiguration, buttonCont
           </InteractionManager>
         </XR>
       </Canvas>
+
       {!isPresenting && gl && (
-        <XRButton
-          gl={gl}
-          configurations={configurations}
-          onConfiguration={onConfiguration}
-          buttonContent={buttonContent}
-        />
+        <>
+          <div style={{ position: 'absolute', bottom: 'calc(50%)', width: '100%' }}>
+            STONE STORIES
+          </div>
+
+          <XRButton
+            gl={gl}
+            configurations={configurations}
+            onConfiguration={onConfiguration}
+            buttonContent={buttonContent}
+          />
+        </>
       )}
     </>
   );
