@@ -26,7 +26,11 @@ export function XRCanvas({ children, configurations, onConfiguration, buttonCont
   return (
     <>
       <Canvas id="vr" vr {...rest}>
-        {!isPresenting && <LatoText textToDisplay="STONE STORIES" />}
+        {!isPresenting && (
+          <>
+            <LatoText textToDisplay="STONE STORIES" />
+          </>
+        )}
         <XR>
           <InteractionManager>
             <XRWatch onGl={setGl} onIsPresenting={setIsPresenting} />
@@ -37,10 +41,16 @@ export function XRCanvas({ children, configurations, onConfiguration, buttonCont
 
       {!isPresenting && gl && (
         <>
-          <div style={{ position: 'absolute', bottom: 'calc(50%)', width: '100%' }}>
-            STONE STORIES
-          </div>
-
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'black',
+              position: 'absolute',
+              top: 0,
+              zIndex: -15,
+            }}
+          ></div>
           <XRButton
             gl={gl}
             configurations={configurations}

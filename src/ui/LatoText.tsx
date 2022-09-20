@@ -21,9 +21,9 @@ export const LatoText: FunctionComponent<ILatoTextProps> = ({ textToDisplay }) =
   const font = new FontLoader().parse(lato);
 
   return (
-    <mesh>
-      <textGeometry args={[textToDisplay, { font, size: 1, height: 1 }]} />
-      <meshPhysicalMaterial attach="material" color={'white'} />
+    <mesh position={[-1, 0, 0]}>
+      <textGeometry args={[textToDisplay, { font, size: 0.2, height: 0.2 }]} />
+      <meshBasicMaterial attach="material" color={'white'} />
     </mesh>
   );
 };
