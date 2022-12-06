@@ -155,6 +155,7 @@
         sixDofDragBehavior.onDragEndObservable.add((event) => {
           console.log("dragEnd");
           console.log(event);
+          //we should check whats happening with the physics stuff while drag is happening, is this duping an imposter?
           rockMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
             rockMesh,
             BABYLON.PhysicsImpostor.ConvexHullImpostor,
