@@ -61,6 +61,7 @@
           disableWebGL2Support: false,
         });
       };
+
       var createScene = async function () {
         await Ammo();
         // Setup basic scene
@@ -71,7 +72,8 @@
           scene
         );
         camera.setTarget(BABYLON.Vector3.Zero());
-        camera.attachControl(canvas, true);
+        //this is for moving the camera, currently disabled
+        //camera.attachControl(canvas, true);
         var light = new BABYLON.HemisphericLight(
           "light1",
           new BABYLON.Vector3(0, 1, 0),
@@ -83,12 +85,12 @@
 
         // Enable physics
         scene.enablePhysics(
-          new BABYLON.Vector3(0, -10, 0),
+          new BABYLON.Vector3(0, -9.81, 0),
           new BABYLON.AmmoJSPlugin()
         );
 
         // Create ground collider
-        var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
+        var ground = BABYLON.Mesh.CreateGround("ground1", 10, 10, 2, scene);
         ground.physicsImpostor = new BABYLON.PhysicsImpostor(
           ground,
           BABYLON.PhysicsImpostor.BoxImpostor,
@@ -96,69 +98,33 @@
           scene
         );
 
-        // Import gltf
-        var newMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
+        //load the rock in
+        let newMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
           "",
-          "https://dl.dropboxusercontent.com/s/9dyg4qbwqt57svg/",
-          "cube.babylon",
+          "https://dl.dropboxusercontent.com/s/pho72q9uw7fqq2x/",
+          "rock-irregular.gltf",
           scene
         );
+        //get the meshes
+        newMeshes = newMeshes.meshes;
+        //theres only one (i think)
+        const rockMesh = newMeshes[0];
+        rockMesh.position.set(0, 0, 0);
 
-        newMeshes.meshes[0].position.x = 0;
-        newMeshes.meshes[0].position.y = 5;
-        newMeshes.meshes[0].position.z = 0;
+        // Create a physics root and add our imported mesh children
+        var physicsRoot = new BABYLON.Mesh("", scene);
+        physicsRoot.addChild(rockMesh);
+        physicsRoot.position.y += 3;
 
-        console.log(newMeshes.meshes[0]);
-
-        console.log(newMeshes.meshes[0].position);
-
-        // Convert to physics object and position
-        var physicsRoot = makePhysicsObject(newMeshes.meshes, scene, 1);
-        //physicsRoot.position.y += 3;
-
-        return scene;
-      };
-
-      var makePhysicsObject = (newMeshes, scene, scaling) => {
-        // Create physics root and position it to be the center of mass for the imported mesh
-        var physicsRoot = new BABYLON.Mesh("physicsRoot", scene);
-        console.log(physicsRoot.position);
-        physicsRoot.position.y = 5;
-
-        // For all children labeled box (representing colliders), make them invisible and add them as a child of the root object
-        newMeshes.forEach((m, i) => {
-          if (m.name.indexOf("Cube") != -1) {
-            console.log(m.position);
-            m.isVisible = true;
-            physicsRoot.addChild(m);
-          }
-        });
-
-        // Add all root nodes within the loaded gltf to the physics root
-        /*newMeshes.forEach((m, i) => {
-          console.log(m);
-          if (m.parent == null) {
-            physicsRoot.addChild(m);
-          }
-        });*/
-
-        // Make every collider into a physics impostor
-        physicsRoot.getChildMeshes().forEach((m) => {
-          if (m.name.indexOf("Cube") != -1) {
-            m.scaling.x = Math.abs(m.scaling.x);
-            m.scaling.y = Math.abs(m.scaling.y);
-            m.scaling.z = Math.abs(m.scaling.z);
-            m.physicsImpostor = new BABYLON.PhysicsImpostor(
-              m,
-              BABYLON.PhysicsImpostor.BoxImpostor,
-              { mass: 0.01 },
-              scene
-            );
-          }
-        });
-
-        // Scale the root object and turn it into a physics impsotor
-        physicsRoot.scaling.scaleInPlace(scaling);
+        // Enable physics on colliders first then physics root of the mesh
+        //convex hull !! takes the shape of the mesh for physics
+        rockMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+          rockMesh,
+          BABYLON.PhysicsImpostor.ConvexHullImpostor,
+          { mass: 0 },
+          scene
+        );
+        //this is the root that gives it mass
         physicsRoot.physicsImpostor = new BABYLON.PhysicsImpostor(
           physicsRoot,
           BABYLON.PhysicsImpostor.NoImpostor,
@@ -166,7 +132,50 @@
           scene
         );
 
-        return physicsRoot;
+        /*var boundingBox =
+          BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(
+            newMeshes[0]
+          );*/
+
+        //this makes it draggable
+        const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
+        //this is the... distance to move each frame (lower reduces jitter)
+        sixDofDragBehavior.dragDeltaRatio = 0.2;
+        //this one modifies z dragging behavior
+        sixDofDragBehavior.zDragFactor = 0.2;
+
+        sixDofDragBehavior.onDragStartObservable.add((event) => {
+          console.log("dragStart");
+          console.log(event);
+        });
+        sixDofDragBehavior.onDragObservable.add((event) => {
+          console.log("drag");
+          console.log(event);
+        });
+        sixDofDragBehavior.onDragEndObservable.add((event) => {
+          console.log("dragEnd");
+          console.log(event);
+          rockMesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+            rockMesh,
+            BABYLON.PhysicsImpostor.ConvexHullImpostor,
+            { mass: 0 },
+            scene
+          );
+          physicsRoot.physicsImpostor = new BABYLON.PhysicsImpostor(
+            physicsRoot,
+            BABYLON.PhysicsImpostor.NoImpostor,
+            { mass: 3 },
+            scene
+          );
+        });
+
+        rockMesh.addBehavior(sixDofDragBehavior);
+
+        // Orient the physics root
+        physicsRoot.rotation.x = Math.PI / 5;
+        physicsRoot.rotation.z = Math.PI / 6;
+
+        return scene;
       };
 
       window.initFunction = async function () {
